@@ -3,9 +3,8 @@ const products = [];
 
 const ProductRow = (props) => (
 	<tr>
-		<td className="hidden">{props.product.id}</td>
 		<td>{props.product.productName}</td>
-		<td>{props.product.price}</td>
+		<td>${props.product.price}</td>
 		<td>{props.product.category}</td>
 		<td><a href={props.product.imageUrl} target="_blank"><u>View</u></a></td>
 	</tr>
@@ -16,7 +15,6 @@ function ProductTable(props) {
 		<table className="bordered-table colmn-width">
 			<thead>
 				<tr>
-					<th className="hidden">Id</th>
 					<th>Product Name</th>
 					<th>Price</th>
 					<th>Category</th>
@@ -28,40 +26,6 @@ function ProductTable(props) {
 	);
 }
 
-class ProductList extends React.Component {
-	constructor() {
-		super();
-		this.state = { products: [] };
-		this.createProduct = this.createProduct.bind(this);
-	}
-	componentDidMount() {
-		this.loadData();
-	}
-	loadData() {
-		setTimeout(() => {
-			this.setState({ products: products });
-		}, 500);
-	}
-	createProduct(newProduct) {
-		const newProducts = this.state.products.slice();
-		newProduct.id = this.state.products.length + 1;
-		newProducts.push(newProduct);
-		this.setState({ products: newProducts });
-	}
-	render() {
-		return (
-			<div>
-			<h1>My Company Inventory</h1>
-			<div>Showing all available products.</div>
-			<hr />
-			<ProductTable products={this.state.products} />
-			<div className="top-buffer">Add a new product to inventory</div>
-			<hr />
-			<ProductAdd createProduct={this.createProduct} />
-			</div>
-		);
-	}
-}
 
 class ProductAdd extends React.Component {
 	constructor() {
@@ -73,11 +37,11 @@ class ProductAdd extends React.Component {
 		var form = document.forms.productAdd;
 		this.props.createProduct({
 			category: form.category.value,
-			price: "$" + form.price.value,
+			price: form.price.value.slice(1),
 			productName: form.productName.value,
 			imageUrl: form.imageUrl.value,
 		});
-		form.category.value = ""; form.price.value = ""; form.productName.value = ""; form.imageUrl.value = "";
+		form.category.value = ""; form.price.value = "$"; form.productName.value = ""; form.imageUrl.value = "";
 	}
 	render() {
 		return (
@@ -100,7 +64,7 @@ class ProductAdd extends React.Component {
 							</select>
 						</div>
 						<div className="col-sm-6">
-							<input className="form-control" type="text" name="price" placeholder="$" />
+							<input className="form-control" type="text" name="price" />
 						</div>
 					</div>
 					<div className="form-group">
@@ -125,6 +89,36 @@ class ProductAdd extends React.Component {
 				</form>
 			</div>
 		)
+	}
+}
+
+class ProductList extends React.Component {
+	constructor() {
+		super();
+		this.state = { products: [] };
+		this.createProduct = this.createProduct.bind(this);
+	}
+	componentDidMount() {
+		document.forms.productAdd.price.value = "$";
+	}
+	createProduct(newProduct) {
+		const newProducts = this.state.products.slice();
+		newProduct.id = this.state.products.length + 1;
+		newProducts.push(newProduct);
+		this.setState({ products: newProducts });
+	}
+	render() {
+		return (
+			<div>
+			<h1>My Company Inventory</h1>
+			<div>Showing all available products.</div>
+			<hr />
+			<ProductTable products={this.state.products} />
+			<div className="top-buffer">Add a new product to inventory</div>
+			<hr />
+			<ProductAdd createProduct={this.createProduct} />
+			</div>
+		);
 	}
 }
 
